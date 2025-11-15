@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 const versionInfo = {
