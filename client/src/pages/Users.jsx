@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { MdDelete } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
 import EmptyUsers from "../assets/watching-users.svg";
+import { MdAddCircle } from "react-icons/md";
 
 
 export default function Users() {
@@ -84,15 +85,15 @@ export default function Users() {
     <div className="p-6 h-full flex flex-col gap-6">
       <div className="flex justify-between items-center h-fit">
         <div className="w-2/3 flex items-center gap-4">
-          <h2 className="text-xl font-semibold">Users</h2>
-          <input onChange={(e) => setSearchText(e.target.value)} className="min-w-0 grow px-4 py-1 border border-gray-300 rounded-3xl outline-none" type="search" placeholder="Search by name/email" />
+          {/* <h2 className="text-xl font-semibold">Users</h2> */}
+          <input onChange={(e) => setSearchText(e.target.value)} className="min-w-0 grow px-4 py-1 border border-gray-300 rounded-md outline-none" type="search" placeholder="Search by name/email" />
         </div>
 
         <button
           onClick={handleAdd}
-          className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
+          className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer flex gap-2 items-center"
         >
-          + Add User
+          <MdAddCircle /> Add User
         </button>
       </div>
 

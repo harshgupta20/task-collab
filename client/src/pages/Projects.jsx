@@ -13,6 +13,7 @@ const Projects = () => {
 
   const [open, setOpen] = useState({ status: false, data: null });
   const [projects, setProjects] = useState([]);
+  const [searchText, setSearchText] = useState('');
 
   const createProject = async ({ data }) => {
     try {
@@ -62,24 +63,26 @@ const Projects = () => {
     }
   }
 
-  const handleEditProject = async () => {
-  }
-
   useEffect(() => {
     fetchProjects();
   }, [])
-console.log("harsh projects", projects)
+  console.log("harsh projects", projects)
   return (
     <div className="p-4 h-full">
       {/* <h1>Projects</h1>  */}
 
       <div className="h-full">
-        <div className="flex justify-end">
-          <button onClick={() => setOpen({ status: true, data: null })} className="bg-green-600 flex gap-2 items-center text-white py-1 px-3 rounded-2xl cursor-pointer"><MdAddCircle />Create Project</button>
+        <div className="flex justify-between border-b border-gray-200 pb-4">
+          <input type="text" onChange={(e) => setSearchText(e.target.value)} placeholder="Search projects..." className="border border-gray-300 rounded-md px-3 py-1 w-1/3 outline-none" />
+          <button onClick={() => setOpen({ status: true, data: null })} className="bg-green-600 flex gap-2 items-center text-white py-1 px-3 rounded-md cursor-pointer"><MdAddCircle />Create Project</button>
         </div>
 
         <div className="flex h-full grow justify-start gap-4 flex-wrap py-4">
-          {projects.map((projectData, index) => {
+          {projects?.filter((projectData) => (
+            projectData.project_name.toLowerCase().includes(searchText.toLowerCase()) ||
+            projectData.project_description.toLowerCase().includes(searchText.toLowerCase()) ||
+            projectData.created_by.toLowerCase().includes(searchText.toLowerCase())
+          )).map((projectData, index) => {
             return (
               <div key={index} className="flex justify-between items-start gap-2 w-[300px] h-fit border border-gray-200 rounded-md p-3 hover:bg-gray-100">
                 <Link to={`/projects/${projectData.id}`} className="flex-1">
