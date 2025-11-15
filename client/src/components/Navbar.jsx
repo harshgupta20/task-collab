@@ -43,7 +43,7 @@ const Navbar = () => {
                 <div className='flex flex-col gap-3 w-full'>
                     {ROUTES.map((route, index) => (
                         <Link to={route.path}>
-                            <button className='w-full flex gap-2 items-center text-left p-2 bg-gray-100 text-green-600 hover:bg-green-300 rounded-md cursor-pointer' key={index}>
+                            <button className='w-full flex gap-2 items-center text-left p-2 bg-gray-100 text-green-600 hover:bg-green-100 rounded-md cursor-pointer' key={index}>
                                 <span>{route.icon}</span>{route.name}
                             </button>
                         </Link>
@@ -53,13 +53,13 @@ const Navbar = () => {
 
             <div className='flex flex-col gap-3 w-full'>
                 <Link to={'/help-center'}>
-                    <button className='w-full flex gap-2 items-center text-left p-2 text-green-600 bg-gray-100 hover:bg-green-300 rounded-md cursor-pointer'>
+                    <button className='w-full flex gap-2 items-center text-left p-2 text-green-600 bg-gray-100 hover:bg-green-100 rounded-md cursor-pointer'>
                         <MdLiveHelp />
                         Help Center
                     </button>
                 </Link>
 
-                <Link><button className='w-full flex gap-2 items-center text-left p-2 text-red-600 bg-gray-100 hover:bg-red-300 rounded-md cursor-pointer'>
+                <Link><button className='w-full flex gap-2 items-center text-left p-2 text-red-600 bg-gray-100 hover:bg-red-100 rounded-md cursor-pointer'>
                     <MdLogout />Logout
                 </button></Link>
             </div>
