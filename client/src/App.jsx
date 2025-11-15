@@ -27,8 +27,8 @@ export default function App() {
           <div className='h-[90dvh] overflow-y-auto'>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/kanban" element={<ExampleParent />} />
-              <Route path="/kanban/:id" element={<KanbanPage />} />
+              <Route path="/projects" element={<ExampleParent />} />
+              <Route path="/projects/:id" element={<KanbanPage />} />
               <Route path="/users" element={<Users />} />
               <Route path="/help-center" element={<HelpCenter />} />
               <Route path="/ask-ai" element={<AskAI />} />

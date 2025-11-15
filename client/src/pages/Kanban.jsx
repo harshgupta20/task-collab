@@ -80,7 +80,7 @@ const Kanban = () => {
           {projects.map((projectData, index) => {
             return (
               <div key={index} className="flex justify-between items-start gap-2 w-[300px] h-fit border border-gray-200 rounded-md p-3 hover:bg-gray-100">
-                <Link to={`/kanban/${projectData.id}`} className="flex-1">
+                <Link to={`/projects/${projectData.id}`} className="flex-1">
                   <div className="font-medium text-sm">{projectData.project_name}</div>
                   {projectData.project_description ? (
                     <div className="text-xs text-gray-500 mt-1">

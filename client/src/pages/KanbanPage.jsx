@@ -81,7 +81,7 @@ export default function KanbanPage() {
                 task_status: newCard?.priority,
                 task_priority: newCard?.priority,
                 optional_message: "Please check the task details ASAP.",
-                task_link: `https://taskcollab.harshtools.shop/kanban/${projectId}`,
+                task_link: `https://taskcollab.harshtools.shop/projects/${projectId}`,
             });
             if (emailResponse?.status) {
                 toast.success(emailResponse?.message);
@@ -250,9 +250,8 @@ export default function KanbanPage() {
 
     return (
         <div className="px-6 h-full">
-            <button onClick={() => sendEmail()}>Send Email</button>
             <div className="py-2">
-                <button className="flex gap-2 items-center text-green-600 py-1 px-3 rounded-lg cursor-pointer" onClick={() => navigate("/kanban")}>
+                <button className="flex gap-2 items-center text-green-600 py-1 px-3 rounded-lg cursor-pointer" onClick={() => navigate("/projects")}>
                     <MdArrowBack /> back
                 </button>
             </div>

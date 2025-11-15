@@ -7,6 +7,8 @@ import { MdLogout } from "react-icons/md";
 import { MdPeopleAlt } from "react-icons/md";
 import { RiChatAiFill } from "react-icons/ri";
 import { BsStars } from "react-icons/bs";
+import { MdOutlineTaskAlt } from "react-icons/md";
+
 
 const Navbar = () => {
 
@@ -17,8 +19,8 @@ const Navbar = () => {
             icon: <MdHomeFilled />
         },
         {
-            name: 'Kanban',
-            path: '/kanban',
+            name: 'Projects',
+            path: '/projects',
             icon: <MdViewKanban />
         },
         {
@@ -37,7 +39,7 @@ const Navbar = () => {
         <div className='p-4 flex flex-col justify-between items-center h-full border-r border-gray-200'>
 
             <div className='flex flex-col gap-10 w-full'>
-                <h1 className='font-bold text-2xl text-green-600'>Tasks</h1>
+                <h1 className='font-bold text-2xl text-green-600 flex gap-2 items-center'> <MdOutlineTaskAlt /> Task Collab</h1>
                 <div className='flex flex-col gap-3 w-full'>
                     {ROUTES.map((route, index) => (
                         <Link to={route.path}>
