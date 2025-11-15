@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
 import { MdViewKanban, MdHomeFilled, MdLiveHelp, MdLogout, MdPeopleAlt, MdOutlineTaskAlt } from "react-icons/md";
 import { BsStars } from "react-icons/bs";
@@ -10,17 +10,24 @@ const Navbar = () => {
         { name: 'Home', path: '/', icon: <MdHomeFilled /> },
         { name: 'Projects', path: '/projects', icon: <MdViewKanban /> },
         { name: 'Users', path: '/users', icon: <MdPeopleAlt /> },
-        { name: 'Ask AI', path: '/ask-ai', icon: <BsStars /> }
+        { name: 'Ask AI', path: '/ask-ai', icon: <BsStars /> },
+        { name: 'Help Center', path: '/help-center', icon: <MdLiveHelp /> },
     ];
 
-    // function to check if route is active
-    const isActive = (path) => {
-        if (path === '/') {
-            return location.pathname === '/'; // Only active for exact home
-        }
-        return location.pathname.startsWith(path); // Active if URL starts with route path
-    };
+    // Update document title on route change
+    useEffect(() => {
+        const activeRoute = ROUTES.find(route => 
+            route.path === '/' 
+                ? location.pathname === '/' 
+                : location.pathname.startsWith(route.path)
+        );
+        document.title = activeRoute ? `${activeRoute.name} | Task Collab` : 'Task Collab';
+    }, [location]);
 
+    const isActive = (path) => {
+        if (path === '/') return location.pathname === '/';
+        return location.pathname.startsWith(path);
+    };
 
     return (
         <div className='p-4 flex flex-col justify-between items-center h-full border-r border-gray-200'>
@@ -30,7 +37,7 @@ const Navbar = () => {
                 </h1>
 
                 <div className='flex flex-col gap-3 w-full'>
-                    {ROUTES.map((route, index) => (
+                    {ROUTES.filter(route => route.path !== '/help-center').map((route, index) => (
                         <Link to={route.path} key={index}>
                             <button
                                 className={`w-full flex gap-2 items-center text-left p-2 rounded-md cursor-pointer
