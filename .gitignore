@@ -3,4 +3,5 @@ node_modules
 dist
 .next
 .vercel
+.firebaserc
 package-lock.json
