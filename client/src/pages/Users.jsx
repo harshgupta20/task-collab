@@ -6,6 +6,7 @@ import PersonCard from "../components/PersonCard";
 import { toast } from "sonner";
 import { MdDelete } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
+import EmptyUsers from "../assets/watching-users.svg";
 
 
 export default function Users() {
@@ -80,8 +81,8 @@ export default function Users() {
   }, []);
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-6 h-full flex flex-col gap-6">
+      <div className="flex justify-between items-center h-fit">
         <div className="w-2/3 flex items-center gap-4">
           <h2 className="text-xl font-semibold">Users</h2>
           <input onChange={(e) => setSearchText(e.target.value)} className="min-w-0 grow px-4 py-1 border border-gray-300 rounded-3xl outline-none" type="search" placeholder="Search by name/email" />
@@ -95,9 +96,9 @@ export default function Users() {
         </button>
       </div>
 
-      <div className="bg-white border rounded-md w-full shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b">
+      <div className="bg-white border border-gray-200 rounded-md w-full shadow-sm overflow-auto min-h-0 grow">
+        <table className={`${usersList.length === 0 && "h-full"} w-full text-left`}>
+          <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-4 py-3 text-sm font-medium">Name</th>
               <th className="px-4 py-3 text-sm font-medium">Email</th>
@@ -108,12 +109,12 @@ export default function Users() {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="">
             {usersList.filter((user) =>
               user.name.toLowerCase().includes(searchText.toLowerCase()) || user.email.toLowerCase().includes(searchText.toLowerCase())
             ).map((user) => (
-              <tr key={user.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3">
+              <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
+                <td className="px-4 py-3 text-green-600">
                   <RichTooltip className="p-0 m-0" title={
                     <PersonCard
                       id={user.id}
@@ -146,6 +147,15 @@ export default function Users() {
                 </td>
               </tr>
             ))}
+
+            {usersList.length === 0 &&
+              <tr className="min-h-0 grow">
+                <td colSpan="4" className="px-4 py-6 text-center text-gray-500">
+                  <img src={EmptyUsers} alt="No users" className="m-auto w-80 h-80" />
+                  Add some users to get started!
+                </td>
+              </tr>}
+
           </tbody>
         </table>
       </div>

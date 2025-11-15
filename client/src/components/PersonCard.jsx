@@ -1,10 +1,12 @@
 // src/components/PersonCard.jsx
 import { Typography, IconButton, Tooltip } from "@mui/material";
 import { MdContentCopy } from "react-icons/md";
+import { toast } from "sonner";
 
 export default function PersonCard({ id, name, email, uuid, isAdmin, position }) {
   const copy = (text) => {
     navigator.clipboard.writeText(text);
+    toast.info('Copied to clipboard');
   };
 
   return (
