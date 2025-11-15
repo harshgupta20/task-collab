@@ -1,8 +1,8 @@
-import versionInfo from '../scripts/writeVersion';
+import PackageJson from "../../package.json";
 
 const Version = () => (
-  <div className="text-gray-500 text-sm">
-    Version: {versionInfo.version} | Commit: {versionInfo.commitHash}
+  <div className="text-gray-300 text-sm">
+    Version: {PackageJson.version}
   </div>
 );
 

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
 import { MdViewKanban, MdHomeFilled, MdLiveHelp, MdLogout, MdPeopleAlt, MdOutlineTaskAlt } from "react-icons/md";
 import { BsStars } from "react-icons/bs";
+import Version from './Version';
 
 const Navbar = () => {
     const location = useLocation();
@@ -16,9 +17,9 @@ const Navbar = () => {
 
     // Update document title on route change
     useEffect(() => {
-        const activeRoute = ROUTES.find(route => 
-            route.path === '/' 
-                ? location.pathname === '/' 
+        const activeRoute = ROUTES.find(route =>
+            route.path === '/'
+                ? location.pathname === '/'
                 : location.pathname.startsWith(route.path)
         );
         document.title = activeRoute ? `${activeRoute.name} | Task Collab` : 'Task Collab';
@@ -32,8 +33,11 @@ const Navbar = () => {
     return (
         <div className='p-4 flex flex-col justify-between items-center h-full border-r border-gray-200'>
             <div className='flex flex-col gap-10 w-full'>
-                <h1 className='font-bold text-2xl text-green-600 flex gap-2 items-center'>
-                    <MdOutlineTaskAlt /> Task Collab
+                <h1 className='font-bold text-2xl text-green-600'>
+                    <div className='flex gap-2 items-center'>
+                        <MdOutlineTaskAlt /> Task Collab
+                    </div>
+                    <Version />
                 </h1>
 
                 <div className='flex flex-col gap-3 w-full'>
