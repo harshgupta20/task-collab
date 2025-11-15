@@ -6,8 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
 import { Link } from "react-router";
 import EmptyProjectListSvg from '../assets/empty-project.svg';
+import { MdCreate } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 
-const Kanban = () => {
+const Projects = () => {
 
   const [open, setOpen] = useState({ status: false, data: null });
   const [projects, setProjects] = useState([]);
@@ -66,10 +68,10 @@ const Kanban = () => {
   useEffect(() => {
     fetchProjects();
   }, [])
-
+console.log("harsh projects", projects)
   return (
     <div className="p-4 h-full">
-      {/* <h1>Kanban</h1>  */}
+      {/* <h1>Projects</h1>  */}
 
       <div className="h-full">
         <div className="flex justify-end">
@@ -87,6 +89,7 @@ const Kanban = () => {
                       {projectData.project_description}
                     </div>
                   ) : null}
+                  <div className="text-xs text-gray-400 mt-4">Created by {'<'}Temp Name{'>'}</div>
                 </Link>
                 <div className="flex flex-col items-end gap-1 ml-2">
                   <button
@@ -96,9 +99,9 @@ const Kanban = () => {
                       // if (newTitle === null) return;
                       // handleEditCard("columnId", "card.id", { title: newTitle });
                     }}
-                    className="text-xs px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+                    className="text-md px-2 py-1 text-green-600 rounded hover:bg-gray-200 cursor-pointer"
                   >
-                    ✏️
+                    <MdCreate />
                   </button>
                   <button
                     title="Delete"
@@ -107,9 +110,9 @@ const Kanban = () => {
                         handleDeleteProject(projectData.id);
                       }
                     }}
-                    className="text-xs px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+                    className="text-md px-2 py-1 text-red-600 rounded hover:bg-gray-200 cursor-pointer"
                   >
-                    🗑
+                    <MdDelete />
                   </button>
                 </div>
               </div>
@@ -136,4 +139,4 @@ const Kanban = () => {
   )
 }
 
-export default Kanban
+export default Projects
