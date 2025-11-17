@@ -11,6 +11,8 @@ import AskAI from './pages/AskAi';
 import Projects from './pages/Projects';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginDialog from './components/LoginDialog';
+import SplashScreen from "./components/SplashScreen";
+import { useEffect, useState } from 'react';
 
 function AppContent() {
   const { user, logout } = useAuth();
@@ -58,6 +60,30 @@ function AppContent() {
 
 export default function App() {
   const { isInstallable, installApp, isOnline } = usePWA();
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // const hasShown = sessionStorage.getItem("splashShown");
+
+    // if (!hasShown) {
+      // Show splash only on first load
+      setLoading(true);
+      // sessionStorage.setItem("splashShown", "true");
+
+      // Animation duration
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 4000); // 3 seconds
+
+      return () => clearTimeout(timer);
+    // } else {
+    //   // Skip splash on internal navigation
+    //   setLoading(false);
+    // }
+  }, []);
+
+  if (loading) return <SplashScreen />;
 
   return (
     <>
