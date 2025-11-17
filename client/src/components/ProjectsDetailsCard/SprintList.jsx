@@ -21,8 +21,8 @@ export default function SprintList({ projectData }) {
 
             setSprints(response.map((sprint) => ({
                 ...sprint,
-                tasks: taskResult.filter((task) => task.sprint_id === sprint.id).length,
-                tasksData: taskResult.filter((task) => task.sprint_id === sprint.id),
+                tasks: taskResult.filter((task) => task.entry_sprint_id === sprint.id).length,
+                tasksData: taskResult.filter((task) => task.entry_sprint_id === sprint.id),
             })))
         }
         catch (error) {
@@ -49,7 +49,7 @@ export default function SprintList({ projectData }) {
         // Delete Sprint Only Logic and erase sprint reference from tasks
         try {
             const deleteSprintResponse = await deleteData("project_sprints", sprint.id);
-            const response = await bulkUpdate("project_entry", sprint.tasksData.map(task => ({ id: task.id, data: { sprint_id: null } })));
+            const response = await bulkUpdate("project_entry", sprint.tasksData.map(task => ({ id: task.id, data: { entry_sprint_id: null } })));
             fetchSprints();
             toast.success("Sprint deleted successfully");
         }
@@ -62,7 +62,7 @@ export default function SprintList({ projectData }) {
     const handleDeleteSprintWithTasks = async ({sprint}) => {
         try {
             const deleteSprintResponse = await deleteData("project_sprints", sprint.id);
-            const response = await deleteByQuery("project_entry", [["sprint_id", "==", sprint.id]]);
+            const response = await deleteByQuery("project_entry", [["entry_sprint_id", "==", sprint.id]]);
             fetchSprints();
             toast.success("Sprint and its tasks deleted successfully");
         }
