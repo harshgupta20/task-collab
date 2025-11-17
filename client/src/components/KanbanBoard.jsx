@@ -489,7 +489,7 @@ export default function KanbanBoard({
                 {/* Sprint line under title (Option 2) */}
                 {card?.sprint ? (
                   <div className="text-xs text-gray-600 mt-1">Sprint: {
-                    cardDialog.sprint && (sprintsList?.find(s => s.id === cardDialog.sprint.id)?.name)
+                    card.sprint && (sprintsList?.find(s => s.id === card.sprint.id)?.name)
                   }</div>
                 ) : null}
 

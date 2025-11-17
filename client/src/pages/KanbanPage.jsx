@@ -68,6 +68,7 @@ export default function KanbanPage() {
                 entry_estimation_hours: newCard.estimate,
                 entry_priority: newCard.priority,
                 entry_tags: JSON.stringify(newCard.tags),
+                entry_sprint_id: newCard?.sprint?.id || null,
             }
             delete data?.id;
             const response = await setData("project_entry", newCard.id, data);
