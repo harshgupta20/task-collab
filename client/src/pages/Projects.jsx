@@ -6,8 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
 import { Link } from "react-router";
 import EmptyProjectListSvg from '../assets/empty-project.svg';
-import { MdCreate } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
+
+import SimpleProjectCard from "../components/SimpleProjectCard";
 
 const Projects = () => {
 
@@ -66,7 +66,7 @@ const Projects = () => {
   useEffect(() => {
     fetchProjects();
   }, [])
-  console.log("harsh projects", projects)
+
   return (
     <div className="p-4 h-full">
       {/* <h1>Projects</h1>  */}
@@ -84,41 +84,12 @@ const Projects = () => {
             projectData.created_by.toLowerCase().includes(searchText.toLowerCase())
           )).map((projectData, index) => {
             return (
-              <div key={index} className="flex justify-between items-start gap-2 w-[300px] h-fit border border-gray-200 rounded-md p-3 hover:bg-gray-100">
-                <Link to={`/projects/${projectData.id}`} className="flex-1">
-                  <div className="font-medium text-sm">{projectData.project_name}</div>
-                  {projectData.project_description ? (
-                    <div className="text-xs text-gray-500 mt-1">
-                      {projectData.project_description}
-                    </div>
-                  ) : null}
-                  <div className="text-xs text-gray-400 mt-4">Created by {'<'}Temp Name{'>'}</div>
-                </Link>
-                <div className="flex flex-col items-end gap-1 ml-2">
-                  <button
-                    title="Edit"
-                    onClick={() => {
-                      setOpen({ status: true, data: projectData });
-                      // if (newTitle === null) return;
-                      // handleEditCard("columnId", "card.id", { title: newTitle });
-                    }}
-                    className="text-md px-2 py-1 text-green-600 rounded hover:bg-gray-200 cursor-pointer"
-                  >
-                    <MdCreate />
-                  </button>
-                  <button
-                    title="Delete"
-                    onClick={() => {
-                      if (window.confirm(`Delete ${projectData.project_name}? This cannot be undone.`)) {
-                        handleDeleteProject(projectData.id);
-                      }
-                    }}
-                    className="text-md px-2 py-1 text-red-600 rounded hover:bg-gray-200 cursor-pointer"
-                  >
-                    <MdDelete />
-                  </button>
-                </div>
-              </div>
+              <SimpleProjectCard
+                projectData={projectData}
+                index={index}
+                onEditClick={setOpen}
+                handleDeleteProject={handleDeleteProject}
+              />
             )
           })}
 

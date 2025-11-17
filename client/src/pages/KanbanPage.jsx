@@ -15,7 +15,7 @@ export default function KanbanPage() {
         // { id: "done", title: "Done" }
     ]);
 
-    const { id: projectId } = useParams();
+    const { projectId } = useParams();
     const [cards, setCards] = useState({});
     const navigate = useNavigate();
     const [projectInfo, setProjectInfo] = useState({});
@@ -94,7 +94,7 @@ export default function KanbanPage() {
             toast.warning(error?.message || 'Failed to add card');
         }
 
-        setCards((prev) => ({ ...prev, [columnId]: [...(prev[columnId] || []), newCard] }));
+        // setCards((prev) => ({ ...prev, [columnId]: [...(prev[columnId] || []), newCard] }));
     };
     const handleCardEdit = async (columnId, cardId, updated) => {
         try {
@@ -246,7 +246,7 @@ export default function KanbanPage() {
         fetchProjectInfo();
         fetchColumns();
         fetchUser();
-    }, [])
+    }, [projectId])
 
     return (
         <div className="px-6 h-full">

@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+/* blur class for background when login modal opens */
+.app-blurred {
+  filter: blur(6px);
+  transition: 0.3s ease;
+  pointer-events: none;
+  user-select: none;
+}

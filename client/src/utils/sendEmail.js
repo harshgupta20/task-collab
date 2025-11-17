@@ -25,7 +25,7 @@ export async function sendEmail({ to, subject, name, innerSubject, update_type, 
             throw new Error(`Request failed: ${response.status}`);
         }
 
-        return {success: true, message: "Email sent successfully" };
+        return {success: true, message: "📩 Email sent successfully" };
     } catch (error) {
         return {success: false, message: error.message || "Failed to send email" };
     }

@@ -28,7 +28,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/:id" element={<KanbanPage />} />
+              <Route path="/projects/:projectId" element={<KanbanPage />} />
               <Route path="/users" element={<Users />} />
               <Route path="/help-center" element={<HelpCenter />} />
               <Route path="/ask-ai" element={<AskAI />} />
