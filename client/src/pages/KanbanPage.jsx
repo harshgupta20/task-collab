@@ -93,7 +93,7 @@ export default function KanbanPage() {
             };
         }
         catch (error) {
-            toast.warning(error?.message || 'Failed to add card');
+            toast.warning(error?.message || 'Failed to add task');
         }
 
         // setCards((prev) => ({ ...prev, [columnId]: [...(prev[columnId] || []), newCard] }));

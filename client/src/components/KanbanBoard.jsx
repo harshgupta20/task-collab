@@ -704,7 +704,7 @@ export default function KanbanBoard({
                     onClick={() => openAddCardDialog(col.id)}
                     className="w-full text-left px-2 py-2 rounded hover:bg-gray-200 text-sm"
                   >
-                    + Add card
+                    + Add Task
                   </button>
                 </div>
               </div>
@@ -824,15 +824,15 @@ export default function KanbanBoard({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          {cardDialog.mode === "add" ? "Add Card" : "Edit Card"}
-        </DialogTitle>
-        <DialogContent dividers>
-          <div className="flex flex-col gap-3">
+        <div className="text-lg font-semibold px-4 p-2">
+          {cardDialog.mode === "add" ? "Add Task" : "Edit Task"}
+        </div>
+        <div className="px-4">
+          <div className="flex flex-col gap-1">
             <TextField
               autoFocus
               margin="dense"
-              label="Card Title"
+              label="Task Title"
               fullWidth
               variant="standard"
               value={cardDialog.title}
@@ -912,11 +912,11 @@ export default function KanbanBoard({
             </div>
 
             {/* Priority / Estimate / Due date */}
-            <div className="flex gap-2 items-center">
+            <div className="py-2">
               <select
                 value={cardDialog.priority}
                 onChange={(e) => setCardDialog({ ...cardDialog, priority: e.target.value })}
-                className="px-2 py-1 border rounded text-sm"
+                className="w-full h-full outline-none px-2 py-3 border rounded text-sm"
               >
                 <option>Low</option>
                 <option>Medium</option>
@@ -924,16 +924,20 @@ export default function KanbanBoard({
                 <option>Critical</option>
               </select>
 
-              <TextField
+              {/* <TextField
                 margin="dense"
                 label="Estimate (pts / hrs)"
                 variant="standard"
                 value={cardDialog.estimate}
                 onChange={(e) => setCardDialog({ ...cardDialog, estimate: e.target.value })}
-              />
+              /> */}
 
+            </div>
+
+            <div>
               <TextField
                 margin="dense"
+                className="w-full"
                 type="date"
                 label="Due Date"
                 InputLabelProps={{ shrink: true }}
@@ -1004,14 +1008,14 @@ export default function KanbanBoard({
             </div>
 
           </div>
-        </DialogContent>
+        </div>
         <DialogActions>
-          <Button onClick={() => setCardDialog({ ...cardDialog, open: false })}>
+          <button className="py-1 px-3 rounded-md bg-gray-200 " onClick={() => setCardDialog({ ...cardDialog, open: false })}>
             Cancel
-          </Button>
-          <Button onClick={onCardDialogSave} variant="contained" color="primary">
+          </button>
+          <button className="py-1 px-3 rounded-md bg-green-600 text-white" onClick={onCardDialogSave} variant="contained" color="primary">
             Save
-          </Button>
+          </button>
         </DialogActions>
       </Dialog>
 
