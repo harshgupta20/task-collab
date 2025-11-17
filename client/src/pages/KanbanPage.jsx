@@ -41,6 +41,7 @@ export default function KanbanPage() {
                             estimate: data?.entry_estimation_hours,
                             priority: data?.entry_priority,
                             tags: JSON.parse(data?.entry_tags),
+                            sprint: data?.entry_sprint_id ? { id: data?.entry_sprint_id } : null,
                         }
                     ]
                 };
@@ -98,7 +99,6 @@ export default function KanbanPage() {
     };
     const handleCardEdit = async (columnId, cardId, updated) => {
         try {
-
             const data = {
                 // project_id: projectId,
                 // columnn_id: columnId,
@@ -111,6 +111,7 @@ export default function KanbanPage() {
                 entry_estimation_hours: updated.estimate,
                 entry_priority: updated.priority,
                 entry_tags: JSON.stringify(updated.tags),
+                entry_sprint_id: updated?.sprint?.id || null,
             }
 
             const response = await updateData("project_entry", cardId, data);

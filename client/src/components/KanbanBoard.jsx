@@ -23,9 +23,9 @@ import FloatingMiniChat from "../components/MiniChat";
 import { BsStars } from "react-icons/bs";
 import { truncateString } from "../utils/utils";
 import EmptyKanbanSvg from "../assets/empty-kanban.svg";
-import { MdArrowBack } from "react-icons/md";
-import { useNavigate } from "react-router";
 import { MdViewKanban } from "react-icons/md";
+import { useNavigate } from "react-router";
+import { customQueryCollection } from "../firebase/firestore";
 
 /**
  * Utility: simple unique id generator
@@ -45,7 +45,7 @@ export default function KanbanBoard({
   onCardDelete,
   onDragEnd,
   projectInfo,
-  usersList=[]
+  usersList = [],
 }) {
   // Local state (when uncontrolled)
   const [columns, setColumns] = useState(initialColumns);
@@ -53,7 +53,9 @@ export default function KanbanBoard({
 
   const [openChat, setOpenChat] = useState(false);
   const [messages, setMessages] = useState([]);
-  
+
+  const [sprintsList, setSprintsList] = useState([]);
+
   const navigate = useNavigate();
 
   // Sync props -> state when props change
@@ -63,9 +65,25 @@ export default function KanbanBoard({
 
   useEffect(() => {
     setCards(initialCards);
-  }, [initialCards]);
+    fetchSprints(projectInfo?.id);
+  }, [initialCards, projectInfo?.id]);
 
-  // Safe setters
+
+  const fetchSprints = async (projectId) => {
+    try {
+      const response = await customQueryCollection("project_sprints", [["project_id", "==", projectId]]);
+      setSprintsList(response?.map(sprint => ({
+        id: sprint.id,
+        name: sprint.name
+      })) || []);
+    }
+    catch (error) {
+      console.error("Error fetching sprints:", error);
+    }
+  };
+
+
+  // Safe state setters
   const safeSetColumns = useCallback(
     (updater) => {
       setColumns((prev) => {
@@ -87,7 +105,7 @@ export default function KanbanBoard({
   );
 
   // ------------------------------
-  // Handlers (same as before, extended card shape)
+  // Handlers for columns
   // ------------------------------
   const handleColumnAdd = (title, description = "") => {
     const newCol = { id: uid("col-"), title: title || "Untitled", description };
@@ -119,17 +137,21 @@ export default function KanbanBoard({
     }
   };
 
+  // ------------------------------
+  // Card creation structure
+  // ------------------------------
   const makeEmptyCard = (overrides = {}) => ({
     id: uid("card-"),
     title: "Untitled",
     description: "",
-    assignees: [], // array of strings (names, ids, emails) - multi-select
-    priority: "Medium", // Low | Medium | High | Critical
-    status: "", // optional freeform / or derived from column
-    estimate: "", // story points or hours (string/number)
-    dueDate: "", // ISO date string
-    tags: [], // array of strings
-    attachments: [], // array of { id, name, type, base64 }
+    assignees: [],
+    priority: "Medium",
+    status: "",
+    estimate: "",
+    dueDate: "",
+    tags: [],
+    attachments: [],
+    sprint: null,    // NEW FIELD
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides
@@ -168,9 +190,12 @@ export default function KanbanBoard({
     }
   };
 
-  // Drag & Drop handler
+  // ------------------------------
+  // Drag & Drop logic
+  // ------------------------------
   const internalOnDragEnd = (result) => {
     if (onDragEnd) onDragEnd(result);
+
     if (!result.destination) return;
 
     const { source, destination } = result;
@@ -179,51 +204,29 @@ export default function KanbanBoard({
     const srcIndex = source.index;
     const dstIndex = destination.index;
 
-    if (srcColId === dstColId) {
-      if (!controlled) {
-        safeSetCards((prev) => {
-          const list = Array.from(prev[srcColId] || []);
-          const [moved] = list.splice(srcIndex, 1);
-          list.splice(dstIndex, 0, moved);
-          return { ...prev, [srcColId]: list };
-        });
-      }
-    } else {
-      if (!controlled) {
-        safeSetCards((prev) => {
-          const srcList = Array.from(prev[srcColId] || []);
-          const dstList = Array.from(prev[dstColId] || []);
-          const [moved] = srcList.splice(srcIndex, 1);
+    if (!controlled) {
+      safeSetCards((prev) => {
+        const srcList = Array.from(prev[srcColId] || []);
+        const dstList = Array.from(prev[dstColId] || []);
+
+        const [moved] = srcList.splice(srcIndex, 1);
+        if (srcColId === dstColId) {
+          srcList.splice(dstIndex, 0, moved);
+          return { ...prev, [srcColId]: srcList };
+        } else {
           dstList.splice(dstIndex, 0, moved);
           return { ...prev, [srcColId]: srcList, [dstColId]: dstList };
-        });
-      }
+        }
+      });
     }
   };
 
   // ================================
-  // DIALOG STATE
+  // DIALOG STATES
   // ================================
-  // Column Add/Edit dialog state
-  const [columnDialog, setColumnDialog] = useState({
-    open: false,
-    mode: "add", // "add" or "edit"
-    columnId: null,
-    title: "",
-    description: ""
-  });
-
-  // Column Delete confirmation dialog
-  const [columnDeleteDialog, setColumnDeleteDialog] = useState({
-    open: false,
-    columnId: null,
-    title: ""
-  });
-
-  // Card Add/Edit dialog state (expanded fields)
   const [cardDialog, setCardDialog] = useState({
     open: false,
-    mode: "add", // "add" or "edit"
+    mode: "add",
     columnId: null,
     cardId: null,
     title: "",
@@ -233,12 +236,29 @@ export default function KanbanBoard({
     status: "",
     estimate: "",
     dueDate: "",
-    tagsInput: "", // temporary comma-separated input
+    sprint: null,            // NEW
+    tagsInput: "",
     tags: [],
-    attachments: [], // array of { id, name, type, base64 }
+    attachments: []
+  });
+  // KanbanBoard.jsx (PART 2/2 — continue from previous part)
+  // ================================
+  // DIALOG OPENERS (cards/columns)
+  // ================================
+  const [columnDialog, setColumnDialog] = useState({
+    open: false,
+    mode: "add",
+    columnId: null,
+    title: "",
+    description: ""
   });
 
-  // Card Delete confirmation dialog
+  const [columnDeleteDialog, setColumnDeleteDialog] = useState({
+    open: false,
+    columnId: null,
+    title: ""
+  });
+
   const [cardDeleteDialog, setCardDeleteDialog] = useState({
     open: false,
     columnId: null,
@@ -246,9 +266,6 @@ export default function KanbanBoard({
     title: ""
   });
 
-  // ================================
-  // DIALOG OPENERS
-  // ================================
   const openAddColumnDialog = () => {
     setColumnDialog({ open: true, mode: "add", columnId: null, title: "", description: "" });
   };
@@ -274,6 +291,7 @@ export default function KanbanBoard({
       status: "",
       estimate: "",
       dueDate: "",
+      sprint: null,
       tagsInput: "",
       tags: [],
       attachments: [],
@@ -286,13 +304,14 @@ export default function KanbanBoard({
       mode: "edit",
       columnId,
       cardId: card.id,
-      title: card.title,
+      title: card.title || "",
       description: card.description || "",
       assignees: Array.isArray(card.assignees) ? card.assignees.slice() : [],
       priority: card.priority || "Medium",
       status: card.status || "",
       estimate: card.estimate || "",
       dueDate: card.dueDate || "",
+      sprint: card.sprint || null,
       tagsInput: (card.tags || []).join(", "),
       tags: Array.isArray(card.tags) ? card.tags.slice() : [],
       attachments: Array.isArray(card.attachments) ? card.attachments.slice() : [],
@@ -309,9 +328,8 @@ export default function KanbanBoard({
   };
 
   // ================================
-  // Card Dialog helpers
+  // File helpers (to base64)
   // ================================
-  // Convert selected FileList to base64 entries (returns Promise)
   const filesToBase64 = (fileList) => {
     const files = Array.from(fileList || []);
     const promises = files.map(file => {
@@ -323,7 +341,7 @@ export default function KanbanBoard({
             name: file.name,
             type: file.type,
             size: file.size,
-            base64: ev.target.result // data:<type>;base64,...
+            base64: ev.target.result
           });
         };
         reader.onerror = (err) => reject(err);
@@ -341,8 +359,7 @@ export default function KanbanBoard({
         attachments: [...prev.attachments, ...base64arr]
       }));
     } catch (err) {
-      // swallow; could expose UI error later
-      // console.error("file read error", err);
+      // swallow for now
     }
   };
 
@@ -362,7 +379,7 @@ export default function KanbanBoard({
   };
 
   // ================================
-  // DIALOG CONFIRM HANDLERS
+  // DIALOG SAVE / DELETE HANDLERS
   // ================================
   const onColumnDialogSave = () => {
     const trimmedTitle = columnDialog.title.trim() || "Untitled";
@@ -380,7 +397,7 @@ export default function KanbanBoard({
   };
 
   const onCardDialogSave = () => {
-    const trimmedTitle = cardDialog.title.trim();
+    const trimmedTitle = (cardDialog.title || "").trim();
     if (!trimmedTitle) return; // don't save empty title
 
     const finalCard = {
@@ -392,6 +409,7 @@ export default function KanbanBoard({
       status: cardDialog.status || "",
       estimate: cardDialog.estimate || "",
       dueDate: cardDialog.dueDate || "",
+      sprint: cardDialog.sprint ? { id: cardDialog.sprint.id, name: cardDialog.sprint.name } : null,
       tags: Array.isArray(cardDialog.tags) ? cardDialog.tags.slice() : [],
       attachments: Array.isArray(cardDialog.attachments) ? cardDialog.attachments.slice() : [],
       updatedAt: new Date().toISOString(),
@@ -413,7 +431,7 @@ export default function KanbanBoard({
   };
 
   // ================================
-  // Render helpers
+  // Render helpers (tags, attachments)
   // ================================
   const renderTags = (tags = []) => {
     if (!tags || !tags.length) return null;
@@ -451,7 +469,7 @@ export default function KanbanBoard({
   };
 
   // ================================
-  // Render Card
+  // Render Card (shows sprint under title as Option 2)
   // ================================
   const renderCard = (card, columnId, index) => {
     return (
@@ -467,6 +485,14 @@ export default function KanbanBoard({
             <div className="flex justify-between items-start gap-2">
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate">{card?.title}</div>
+
+                {/* Sprint line under title (Option 2) */}
+                {card?.sprint ? (
+                  <div className="text-xs text-gray-600 mt-1">Sprint: {
+                    cardDialog.sprint && (sprintsList?.find(s => s.id === cardDialog.sprint.id)?.name)
+                  }</div>
+                ) : null}
+
                 {card?.description ? (
                   <div className="text-xs text-gray-500 mt-1 line-clamp-3">{truncateString(card?.description, 40)}</div>
                 ) : null}
@@ -482,7 +508,7 @@ export default function KanbanBoard({
                     <div className="flex items-center gap-1">
                       {card?.assignees.slice(0, 3).map((a, i) => (
                         <div key={i} className="text-xs px-1.5 py-0.5 rounded-full border">
-                          {typeof a === "string" ? a.split(" ").map(p => p[0]).join("").slice(0, 2) : "U"}
+                          {typeof a === "string" ? a.split(" ").map(p => p[0]).join("").slice(0, 2) : (a?.name ? a.name.split(" ").map(p => p[0]).join("").slice(0, 2) : "U")}
                         </div>
                       ))}
                       {card?.assignees.length > 3 ? (
@@ -525,16 +551,22 @@ export default function KanbanBoard({
     );
   };
 
-
+  // ================================
+  // Chat handler (mini chat)
+  // ================================
   const handleSend = async (text) => {
     setMessages((prev) => [...prev, { role: "user", text }]);
 
-    // Your AI logic here
-    const reply = await myAI(text);
+    // placeholder AI logic - replace with real call if needed
+    const reply = "I'll help with that — (placeholder reply)";
     setMessages((prev) => [...prev, { role: "assistant", text: reply }]);
   };
 
   const columnList = columns || [];
+
+  // ================================
+  // MAIN RENDER
+  // ================================
   return (
     <div className="w-full h-full">
       <div className="mb-4 flex items-center gap-2 border border-green-200 p-2 rounded-lg">
@@ -596,8 +628,7 @@ export default function KanbanBoard({
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`flex-1 min-h-20 overflow-y-auto pb-2 pr-1 ${snapshot.isDraggingOver ? "bg-gray-200" : ""
-                        }`}
+                      className={`flex-1 min-h-20 overflow-y-auto pb-2 pr-1 ${snapshot.isDraggingOver ? "bg-gray-200" : ""}`}
                     >
                       {(cards[col.id] || []).map((card, idx) =>
                         renderCard(card, col.id, idx)
@@ -618,25 +649,15 @@ export default function KanbanBoard({
               </div>
             ))}
 
-            {/* <div className="min-w-[280px] flex items-center justify-center">
-              <div className="w-full h-full flex items-start">
-                <div className="w-full border-dashed border-2 border-gray-200 rounded-lg p-3 flex items-center justify-center text-sm">
-                  Drag cards between columns
-                </div>
+            {columnList.length === 0 && (
+              <div className="flex flex-col gap-6 m-auto h-full items-center w-[300px] rounded-md p-3">
+                <img src={EmptyKanbanSvg} alt="empty_kanban_svg" />
+                <div className="font-medium text-sm">Create columns to get started</div>
               </div>
-            </div> */}
+            )}
           </div>
         </DragDropContext>
 
-        {/* <div>
-          <img src={EmptyKanbanSvg} alt="empty_kanban_svg" />
-        </div> */}
-        {columnList.length === 0 && (
-          <div className="flex flex-col gap-6 m-auto h-full items-center w-[300px] rounded-md p-3">
-            <img src={EmptyKanbanSvg} alt="empty_kanban_svg" />
-            <div className="font-medium text-sm">Create columns to get started</div>
-          </div>
-        )}
         <div className="flex items-center gap-2">
           <FloatingMiniChat
             open={openChat}
@@ -646,7 +667,6 @@ export default function KanbanBoard({
           />
         </div>
       </div>
-
 
       {/* ===== COLUMN ADD/EDIT DIALOG ===== */}
       <Dialog
@@ -707,7 +727,7 @@ export default function KanbanBoard({
         </DialogActions>
       </Dialog>
 
-      {/* ===== COLUMN DELETE CONFIRM DIALOG ===== */}
+      {/* ===== COLUMN DELETE CONFIRM ===== */}
       <Dialog
         open={columnDeleteDialog.open}
         onClose={() =>
@@ -736,7 +756,7 @@ export default function KanbanBoard({
         </DialogActions>
       </Dialog>
 
-      {/* ===== CARD ADD/EDIT DIALOG (expanded fields) ===== */}
+      {/* ===== CARD ADD/EDIT DIALOG (with Sprint single-select) ===== */}
       <Dialog
         open={cardDialog.open}
         onClose={() => setCardDialog({ ...cardDialog, open: false })}
@@ -782,12 +802,35 @@ export default function KanbanBoard({
               }
             />
 
-            {/* Assignees: simple multi-select via comma-separated input for minimal UI */}
+            {/* Sprint single-select (Autocomplete) */}
+            <div>
+              <Autocomplete
+                options={sprintsList}
+                getOptionLabel={(opt) => opt?.name || ""}
+                value={
+                  cardDialog.sprint
+                    ? (sprintsList.find(s => s.id === cardDialog.sprint.id) || cardDialog.sprint)
+                    : null
+                }
+                onChange={(e, newValue) => setCardDialog(prev => ({ ...prev, sprint: newValue }))}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Sprint"
+                    variant="standard"
+                    placeholder="Select sprint (optional)"
+                  />
+                )}
+                disableClearable={false}
+              />
+            </div>
+
+            {/* Assignees */}
             <div>
               <Autocomplete
                 multiple
                 options={usersList}
-                getOptionLabel={(opt) => opt.name}
+                getOptionLabel={(opt) => opt.name || ""}
                 value={usersList.filter((u) =>
                   cardDialog?.assignees?.map((a) => a?.id)?.includes(u.id)
                 )}
@@ -807,7 +850,7 @@ export default function KanbanBoard({
               />
             </div>
 
-            {/* Priority & Estimate & Due date */}
+            {/* Priority / Estimate / Due date */}
             <div className="flex gap-2 items-center">
               <select
                 value={cardDialog.priority}
@@ -839,7 +882,7 @@ export default function KanbanBoard({
               />
             </div>
 
-            {/* Tags input */}
+            {/* Tags */}
             <div>
               <TextField
                 margin="dense"
@@ -899,7 +942,6 @@ export default function KanbanBoard({
               </div>
             </div>
 
-
           </div>
         </DialogContent>
         <DialogActions>
@@ -912,7 +954,7 @@ export default function KanbanBoard({
         </DialogActions>
       </Dialog>
 
-      {/* ===== CARD DELETE CONFIRM DIALOG ===== */}
+      {/* ===== CARD DELETE CONFIRM ===== */}
       <Dialog
         open={cardDeleteDialog.open}
         onClose={() => setCardDeleteDialog({ ...cardDeleteDialog, open: false })}
@@ -938,6 +980,9 @@ export default function KanbanBoard({
   );
 }
 
+/* ==========================
+   PropTypes (updated)
+   ========================== */
 KanbanBoard.propTypes = {
   columns: PropTypes.arrayOf(
     PropTypes.shape({
@@ -952,11 +997,15 @@ KanbanBoard.propTypes = {
         id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
         description: PropTypes.string,
-        assignees: PropTypes.arrayOf(PropTypes.object),
+        assignees: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.object, PropTypes.string])),
         priority: PropTypes.string,
         status: PropTypes.string,
         estimate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         dueDate: PropTypes.string,
+        sprint: PropTypes.shape({
+          id: PropTypes.string,
+          name: PropTypes.string
+        }),
         tags: PropTypes.arrayOf(PropTypes.string),
         attachments: PropTypes.arrayOf(
           PropTypes.shape({
@@ -967,6 +1016,8 @@ KanbanBoard.propTypes = {
             size: PropTypes.number
           })
         ),
+        createdAt: PropTypes.string,
+        updatedAt: PropTypes.string
       })
     )
   ),
@@ -977,5 +1028,22 @@ KanbanBoard.propTypes = {
   onCardAdd: PropTypes.func,
   onCardEdit: PropTypes.func,
   onCardDelete: PropTypes.func,
-  onDragEnd: PropTypes.func
+  onDragEnd: PropTypes.func,
+  projectInfo: PropTypes.object,
+  usersList: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string
+  })),
+  sprintsList: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string
+  }))
+};
+
+KanbanBoard.defaultProps = {
+  columns: [],
+  cards: {},
+  controlled: false,
+  usersList: [],
+  sprintsList: []
 };
