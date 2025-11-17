@@ -3,9 +3,11 @@ import { Link, useLocation } from 'react-router';
 import { MdViewKanban, MdHomeFilled, MdLiveHelp, MdLogout, MdPeopleAlt, MdOutlineTaskAlt } from "react-icons/md";
 import { BsStars } from "react-icons/bs";
 import Version from './Version';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
     const location = useLocation();
+    const { logout } = useAuth();
 
     const ROUTES = [
         { name: 'Home', path: '/', icon: <MdHomeFilled /> },
@@ -64,11 +66,9 @@ const Navbar = () => {
                     </button>
                 </Link>
 
-                <Link to='/logout'>
-                    <button className='w-full flex gap-2 items-center text-left p-2 text-red-600 bg-gray-100 hover:bg-red-100 rounded-md cursor-pointer'>
-                        <MdLogout /> Logout
-                    </button>
-                </Link>
+                <button onClick={logout} className='w-full flex gap-2 items-center text-left p-2 text-red-600 bg-gray-100 hover:bg-red-100 rounded-md cursor-pointer'>
+                    <MdLogout /> Logout
+                </button>
             </div>
         </div>
     );
