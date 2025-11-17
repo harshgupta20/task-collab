@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Button } from "@mui/material";
 import DeleteSprintModal from "./DeleteSprintModal";
+import { bulkUpdate, deleteByQuery, deleteData } from "../../firebase/firestore";
+import { toast } from "sonner";
 
-export default function SprintItem({ sprint }) {
+export default function SprintItem({ sprint, handleOnlySprintClick, handleDeleteSprintWithTasks }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -27,6 +29,8 @@ export default function SprintItem({ sprint }) {
         open={open}
         onClose={() => setOpen(false)}
         sprint={sprint}
+        handleOnlySprintClick={async () => {await handleOnlySprintClick({ sprint }); setOpen(false);}}
+        handleDeleteSprintWithTasks={async () => {await handleDeleteSprintWithTasks({ sprint }); setOpen(false);}}
       />
     </>
   );

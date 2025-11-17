@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
-export default function DeleteSprintModal({ open, onClose, sprint }) {
+export default function DeleteSprintModal({ open, onClose, sprint, handleOnlySprintClick, handleDeleteSprintWithTasks }) {
   if (!sprint) return null;
 
   return (
@@ -19,11 +19,11 @@ export default function DeleteSprintModal({ open, onClose, sprint }) {
       </DialogContent>
 
       <DialogActions className="p-4">
-        <Button variant="contained" color="error" onClick={() => alert("delete w/ tasks")}>
+        <Button variant="contained" color="error" onClick={() => handleDeleteSprintWithTasks(sprint)}>
           Delete With Tasks
         </Button>
 
-        <Button variant="outlined" color="error" onClick={() => alert("delete only sprint")}>
+        <Button variant="outlined" color="error" onClick={() => handleOnlySprintClick(sprint)}>
           Delete Only Sprint
         </Button>
       </DialogActions>

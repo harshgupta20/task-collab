@@ -11,6 +11,7 @@ import {
   deleteDoc,
   query,
   where,
+  writeBatch
 } from "firebase/firestore";
 import { app } from "./config";
 
@@ -50,9 +51,44 @@ export const updateData = async (col, id, data) => {
   return await updateDoc(doc(db, col, id), data);
 };
 
+export const bulkUpdate = async (col, updates) => {
+  // updates: [{ id: "docId1", data: { field: value } }, ...]
+  const batch = writeBatch(db);
+
+  updates.forEach(({ id, data }) => {
+    const docRef = doc(db, col, id);
+    batch.update(docRef, data);
+  });
+
+  await batch.commit();
+};
+
 // DELETE DOCUMENT
 export const deleteData = async (col, id) => {
   return await deleteDoc(doc(db, col, id));
+};
+
+export const bulkDelete = async (col, ids) => {
+  // ids: ["docId1", "docId2", ...]
+  const batch = writeBatch(db);
+
+  ids.forEach((id) => {
+    const docRef = doc(db, col, id);
+    batch.delete(docRef);
+  });
+
+  await batch.commit();
+};
+
+export const deleteByQuery = async (col, conditions = []) => {
+  const docs = await customQueryCollection(col, conditions);
+  const batch = writeBatch(db);
+
+  docs.forEach((d) => {
+    batch.delete(doc(db, col, d.id));
+  });
+
+  await batch.commit();
 };
 
 
