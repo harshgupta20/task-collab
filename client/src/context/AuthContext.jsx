@@ -18,10 +18,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // On mount, check for existing token in localStorage
     const token = localStorage.getItem("token");
-    console.log("harsh token", token)
     if (token) {
         const userData = decodeData(token);
-        console.log("userdata", userData)
         setUser(userData);
     }
   }, []);

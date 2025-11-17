@@ -22,7 +22,6 @@ export default function SprintList({ projectData }) {
         try {
             const response = await customQueryCollection("project_sprints", [["project_id", "==", projectData.id]]);
             const taskResult = await customQueryCollection("project_entry", [["project_id", "==", projectData.id]]);
-            console.log("harsh ")
         }
         catch (error) {
             toast.warning(error?.message || "Failed to fetch sprints");

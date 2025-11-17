@@ -77,7 +77,7 @@ const Projects = () => {
           <button onClick={() => setOpen({ status: true, data: null })} className="bg-green-600 flex gap-2 items-center text-white py-1 px-3 rounded-md cursor-pointer"><MdAddCircle />Create Project</button>
         </div>
 
-        <div className="flex h-full grow justify-start gap-4 flex-wrap py-4">
+        <div className="flex justify-start gap-4 flex-wrap py-4">
           {projects?.filter((projectData) => (
             projectData.project_name.toLowerCase().includes(searchText.toLowerCase()) ||
             projectData.project_description.toLowerCase().includes(searchText.toLowerCase()) ||
