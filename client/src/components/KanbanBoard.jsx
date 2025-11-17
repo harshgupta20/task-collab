@@ -66,11 +66,6 @@ export default function KanbanBoard({
     setColumns(initialColumns);
   }, [initialColumns]);
 
-  useEffect(() => {
-    setCards(initialCards);
-    fetchSprints(projectInfo?.id);
-  }, [initialCards, projectInfo?.id]);
-
 
   const fetchSprints = async (projectId) => {
     try {
@@ -588,6 +583,11 @@ export default function KanbanBoard({
     return result;
   }
 
+  useEffect(() => {
+    // setCards(initialCards);
+    setCards(filterBoardBySprintId(initialCards, selectedSprintId));
+    fetchSprints(projectInfo?.id);
+  }, [initialCards, projectInfo?.id]);
 
   const handleChange = (event) => {
     const selectSprintId = event?.target?.value;
