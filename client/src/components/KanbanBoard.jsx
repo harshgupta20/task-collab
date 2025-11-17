@@ -16,7 +16,10 @@ import {
   Button,
   TextField,
   Typography,
-  Autocomplete
+  Autocomplete,
+  FormControl,
+  Select,
+  MenuItem
 } from "@mui/material";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import FloatingMiniChat from "../components/MiniChat";
@@ -564,15 +567,73 @@ export default function KanbanBoard({
 
   const columnList = columns || [];
 
+
+  const [selectedSprintId, setSelectedSprintId] = useState("all");
+  function filterBoardBySprintId(boardData, sprintId) {
+
+    let localSprintId = sprintId;
+    if (localSprintId === "all") {
+      return boardData;
+    }
+    else if (localSprintId === "unassigned") {
+      localSprintId = null;
+    }
+
+    const result = {};
+    Object.entries(boardData).forEach(([colId, cards]) => {
+      result[colId] = cards.filter(
+        card => card.sprint && card.sprint.id === localSprintId
+      );
+    });
+    return result;
+  }
+
+
+  const handleChange = (event) => {
+    const selectSprintId = event?.target?.value;
+    setSelectedSprintId(selectSprintId);
+
+    setCards(filterBoardBySprintId(initialCards, selectSprintId));
+    // const selectedSprint = sprintsList.find(sprint => sprint.id === selectSprintId) || null;
+    // navigate(`/projects/${event.target.value}`);
+  }
+
   // ================================
   // MAIN RENDER
   // ================================
   return (
     <div className="w-full h-full">
       <div className="mb-4 flex items-center gap-2 border border-green-200 p-2 rounded-lg">
-        <div className="flex items-center gap-1">
-          <MdViewKanban className="w-7 h-7 text-green-600" />
-          <span className="font-semibold text-gray-800">{projectInfo?.project_name}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <MdViewKanban className="w-7 h-7 text-green-600" />
+            <span className="font-semibold text-gray-800">{projectInfo?.project_name}</span>
+          </div>
+
+          <FormControl size="small" className="w-36">
+            <Select
+              value={selectedSprintId}
+              onChange={handleChange}
+              className="bg-white rounded-md"
+              sx={{
+                fontSize: "14px",
+                height: "36px",
+                ".MuiSelect-select": { paddingY: "8px" },
+              }}
+            >
+              {sprintsList?.map((opt) => (
+                <MenuItem key={opt.id} value={opt.id}>
+                  {opt.name}
+                </MenuItem>
+              ))}
+              <MenuItem value="all">
+                All Sprints
+              </MenuItem>
+              <MenuItem value="unassigned">
+                Unassigned Sprints
+              </MenuItem>
+            </Select>
+          </FormControl>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <button onClick={() => setOpenChat(true)} className="flex gap-2 bg-green-200 text-green-800 items-center py-1 px-3 rounded-lg cursor-pointer">

@@ -41,7 +41,7 @@ export default function KanbanPage() {
                             estimate: data?.entry_estimation_hours,
                             priority: data?.entry_priority,
                             tags: JSON.parse(data?.entry_tags),
-                            sprint: data?.entry_sprint_id ? { id: data?.entry_sprint_id } : null,
+                            sprint: data?.entry_sprint_id ? { id: data?.entry_sprint_id } : { id: null },
                         }
                     ]
                 };
