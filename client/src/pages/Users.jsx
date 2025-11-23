@@ -32,7 +32,7 @@ export default function Users() {
       setUsersList(response);
     }
     catch (error) {
-      console.log("harsh error", error);
+      console.log("error", error);
     }
   }
 
