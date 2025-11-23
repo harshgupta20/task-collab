@@ -18,7 +18,8 @@ import {
   Autocomplete,
   FormControl,
   Select,
-  MenuItem
+  MenuItem,
+  Tooltip
 } from "@mui/material";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import FloatingMiniChat from "../components/MiniChat";
@@ -29,6 +30,7 @@ import { MdViewKanban } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { customQueryCollection } from "../firebase/firestore";
 import CreateSubtaskDialog from "./CreateSubTaskDialog";
+import { LuRefreshCcw } from "react-icons/lu";
 
 
 export default function KanbanBoard({
@@ -44,6 +46,7 @@ export default function KanbanBoard({
   onDragEnd,
   projectInfo,
   usersList = [],
+  refetchBoardData,
 }) {
   // Local state (when uncontrolled)
   const [columns, setColumns] = useState(initialColumns);
@@ -285,7 +288,7 @@ export default function KanbanBoard({
       status: "",
       estimate: "",
       dueDate: "",
-      sprint: null,
+      sprint: {id: selectedSprintId, name: sprintsList.find(s => s.id === selectedSprintId)?.name} || null,
       tagsInput: "",
       tags: [],
       attachments: [],
@@ -487,7 +490,7 @@ export default function KanbanBoard({
                   }</div>
                 ) : null}
 
-                <button onClick={() => setSubtaskDialogOpen(card.id)} className="text-xs bg-green-600 text-white py-1 px-3 rounded-md">Sub Tasks : </button>
+                <button onClick={() => setSubtaskDialogOpen(card.id)} className="text-xs bg-green-600 text-white py-1 px-3 rounded-md">View Tasks : {card?.subtasks?.length || 0}</button>
 
                 {card?.description ? (
                   <div className="text-xs text-gray-500 mt-1 line-clamp-3">{truncateString(card?.description, 40)}</div>
@@ -606,6 +609,9 @@ export default function KanbanBoard({
           <div className="flex items-center gap-1">
             <MdViewKanban className="w-7 h-7 text-green-600" />
             <span className="font-semibold text-gray-800">{projectInfo?.project_name}</span>
+            <Tooltip title="Refresh Board Data">
+              <LuRefreshCcw className="text-green-600 cursor-pointer" onClick={refetchBoardData} />
+            </Tooltip>
           </div>
 
           <FormControl size="small" className="w-36">
@@ -1043,10 +1049,14 @@ export default function KanbanBoard({
 
 
       {/* ===== SubTask Dialog ===== */}
-      {
-        subtaskDialogOpen &&
-        <CreateSubtaskDialog open={subtaskDialogOpen} onClose={() => setSubtaskDialogOpen(false)} taskId={subtaskDialogOpen} onSubmit={() => { }} />
-      }
+      {subtaskDialogOpen &&
+        <CreateSubtaskDialog
+          open={subtaskDialogOpen}
+          onClose={() => setSubtaskDialogOpen(false)}
+          projectId={projectInfo?.id}
+          taskId={subtaskDialogOpen}
+          onSubmit={() => { refetchBoardData(); }}
+        />}
     </div>
   );
 }

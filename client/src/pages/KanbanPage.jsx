@@ -21,9 +21,34 @@ export default function KanbanPage() {
     const [projectInfo, setProjectInfo] = useState({});
     const [usersList, setUsersList] = useState([]);
 
+    const fetchSubTasks = async (projectId) => {
+        try {
+            const response = await customQueryCollection("project_subtasks", [["project_id", "==", projectId]]);
+            return response?.map((item) => ({ id: item.id, name: item.name, task_id: item.task_id, project_id: item.project_id })) || [];
+        }
+        catch (error) {
+            toast.error(error?.message || "Failed to fetch subtasks");
+            return [];
+        }
+    };
+
+    const sortSubTasksByCardId = (allSubTasks) => {
+        const sorted = {};
+        allSubTasks.forEach((subtask) => {
+            const taskId = subtask.task_id;
+            if (!sorted[taskId]) {
+                sorted[taskId] = [];
+            }
+            sorted[taskId].push({ id: subtask.id, name: subtask.name });
+        });
+        return sorted;
+    };
+
     const fetchCardsData = async () => {
         try {
             const response = await customQueryCollection("project_entry", [["project_id", "==", projectId]]);
+            const allSubTasks = await fetchSubTasks(projectId);
+            const subTaskByTaskId = sortSubTasksByCardId(allSubTasks);
 
             let formattedData = {};
             response?.forEach((data) => {
@@ -42,16 +67,23 @@ export default function KanbanPage() {
                             priority: data?.entry_priority,
                             tags: JSON.parse(data?.entry_tags),
                             sprint: data?.entry_sprint_id ? { id: data?.entry_sprint_id } : { id: null },
+                            subtasks: subTaskByTaskId[data?.entry_uuid] || [],
                         }
                     ]
                 };
             });
+
 
             setCards(formattedData);
         }
         catch (error) {
             toast.warning(error?.message || 'Failed to fetch cards');
         }
+    }
+
+    const refetchBoardData = async () => {
+        await fetchColumns();
+        toast.success('Board data refreshed successfully');
     }
 
     const handleCardAdd = async (columnId, newCard) => {
@@ -270,6 +302,7 @@ export default function KanbanPage() {
                 onDragEnd={handleDrag}
                 projectInfo={projectInfo}
                 usersList={usersList}
+                refetchBoardData={refetchBoardData}
             />
         </div>
     );

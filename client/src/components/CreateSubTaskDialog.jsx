@@ -8,7 +8,7 @@ import { MdDelete } from "react-icons/md";
 import { addData, customQueryCollection, deleteData } from "../firebase/firestore";
 import { toast } from "sonner";
 
-const CreateSubtaskDialog = ({ open, onClose, onSubmit, taskId = null }) => {
+const CreateSubtaskDialog = ({ open, onClose, onSubmit, projectId=null, taskId = null }) => {
     const [subtaskName, setSubtaskName] = useState("");
     const [subtasks, setSubtasks] = useState([]);
 
@@ -16,10 +16,11 @@ const CreateSubtaskDialog = ({ open, onClose, onSubmit, taskId = null }) => {
         if (!subtaskName.trim()) return;
 
         try {
-            const response = await addData("project_subtasks", { name: subtaskName.trim(), task_id: taskId });
+            const response = await addData("project_subtasks", { name: subtaskName.trim(), task_id: taskId, project_id: projectId });
             toast.success("Subtask added successfully");
             setSubtaskName("");
             fetchSubTasks();
+            onSubmit();
         }
         catch (error) {
             toast.error(error?.message || "Failed to add subtask");
