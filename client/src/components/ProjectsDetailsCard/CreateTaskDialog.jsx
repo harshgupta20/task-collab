@@ -98,6 +98,10 @@ export default function TaskDialog({ open, mode = "add", onClose, sprintList, pr
         console.log("Saving task:", cardDialog);
         try {
 
+            if(cardDialog?.column?.id){
+                toast.error('Please select a column');
+                return;
+            }
 
             const data = {
                 project_id: projectId,

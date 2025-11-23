@@ -1,5 +1,4 @@
 import Navbar from './components/Navbar';
-import { usePWA } from './hooks/usePWA';
 import Home from './pages/Home';
 import { Routes, Route } from 'react-router';
 import Users from './pages/Users';
@@ -59,7 +58,6 @@ function AppContent() {
 }
 
 export default function App() {
-  const { isInstallable, installApp, isOnline } = usePWA();
 
   const [loading, setLoading] = useState(true);
 

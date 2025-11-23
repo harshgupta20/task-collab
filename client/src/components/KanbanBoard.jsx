@@ -28,6 +28,7 @@ import EmptyKanbanSvg from "../assets/empty-kanban.svg";
 import { MdViewKanban } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { customQueryCollection } from "../firebase/firestore";
+import CreateSubtaskDialog from "./CreateSubTaskDialog";
 
 
 export default function KanbanBoard({
@@ -52,6 +53,7 @@ export default function KanbanBoard({
   const [messages, setMessages] = useState([]);
 
   const [sprintsList, setSprintsList] = useState([]);
+  const [subtaskDialogOpen, setSubtaskDialogOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -484,6 +486,8 @@ export default function KanbanBoard({
                     card.sprint && (sprintsList?.find(s => s.id === card.sprint.id)?.name)
                   }</div>
                 ) : null}
+
+                <button onClick={() => setSubtaskDialogOpen(card.id)} className="text-xs bg-green-600 text-white py-1 px-3 rounded-md">Sub Tasks : </button>
 
                 {card?.description ? (
                   <div className="text-xs text-gray-500 mt-1 line-clamp-3">{truncateString(card?.description, 40)}</div>
@@ -1035,6 +1039,14 @@ export default function KanbanBoard({
           </Button>
         </DialogActions>
       </Dialog>
+
+
+
+      {/* ===== SubTask Dialog ===== */}
+      {
+        subtaskDialogOpen &&
+        <CreateSubtaskDialog open={subtaskDialogOpen} onClose={() => setSubtaskDialogOpen(false)} taskId={subtaskDialogOpen} onSubmit={() => { }} />
+      }
     </div>
   );
 }
