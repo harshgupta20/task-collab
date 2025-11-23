@@ -4,9 +4,11 @@ import { POSITIONS } from "../utils/constants";
 import { addData } from "../firebase/firestore";
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
 
 export default function UserModal({ open, onClose, user, onSubmit }) {
   const [form, setForm] = useState({ name: null, email: null, password: null, position: POSITIONS[0], is_admin: false });
+  const { user: authUser, logout } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -36,8 +38,9 @@ export default function UserModal({ open, onClose, user, onSubmit }) {
         position: form.position,
         is_admin: form.is_admin,
         uuid: uuidv4(),
-        created_by: "00"
+        created_by: authUser?.id,
       }
+
       const response = await onSubmit({data});
       if(response?.status){
         toast.success(response?.message);

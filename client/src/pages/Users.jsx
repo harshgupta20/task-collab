@@ -28,7 +28,7 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const response = await customQueryCollection("users", [["created_by", "==", "00"]]);
+      const response = await customQueryCollection("users", []);
       setUsersList(response);
     }
     catch (error) {

@@ -6,7 +6,6 @@ import {
   Droppable,
   Draggable
 } from "@hello-pangea/dnd";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   Dialog,
@@ -24,17 +23,12 @@ import {
 import { RiFileExcel2Fill } from "react-icons/ri";
 import FloatingMiniChat from "../components/MiniChat";
 import { BsStars } from "react-icons/bs";
-import { truncateString } from "../utils/utils";
+import { truncateString, uid } from "../utils/utils";
 import EmptyKanbanSvg from "../assets/empty-kanban.svg";
 import { MdViewKanban } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { customQueryCollection } from "../firebase/firestore";
 
-/**
- * Utility: simple unique id generator
- */
-const uid = (prefix = "") =>
-  prefix + uuidv4().replace(/-/g, "");
 
 export default function KanbanBoard({
   columns: initialColumns = [],
